@@ -15,9 +15,9 @@ public class ProjectSecurityConfig {
 
         http.authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards").authenticated()
-                .requestMatchers("/notices", "/contact", "/error").permitAll());
-        http.formLogin(withDefaults());
-        http.httpBasic(withDefaults());
+                .requestMatchers("/notices", "/contact").permitAll());
+        http.formLogin(dfl->dfl.disable());
+        http.httpBasic(dhb->dhb.disable());
         return http.build();
     }
 }
