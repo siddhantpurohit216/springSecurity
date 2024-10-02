@@ -1,19 +1,16 @@
 package com.springSecuriy.springsecuritysec1.Configs;
 
+import javax.sql.DataSource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.password.CompromisedPasswordChecker;
+import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 
 @Configuration
@@ -31,12 +28,11 @@ public class ProjectSecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService()
+    public UserDetailsService userDetailsService(DataSource dataSource)
     {
-        UserDetails user= User.withUsername("user").password("{noop}1234").authorities("read").build();
-        UserDetails admin= User.withUsername("admin").password("{bcrypt}$2a$12$w9LeZfI77qosoM24ja882eO6l/Ia2vrRHOLNvVSjWOwfFa.I60dEi").authorities("read").build();
+        
 
-        return new InMemoryUserDetailsManager(user,admin);
+        return new JdbcUserDetailsManager(dataSource);
     }
 
     @Bean
@@ -45,9 +41,9 @@ public class ProjectSecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    @Bean
-    public CompromisedPasswordChecker compromisedPasswordChecker()
-    {
-        return new HaveIBeenPwnedRestApiPasswordChecker();
-    }
+    // @Bean
+    // public CompromisedPasswordChecker compromisedPasswordChecker()
+    // {
+    //     return new HaveIBeenPwnedRestApiPasswordChecker();
+    // }
 }
