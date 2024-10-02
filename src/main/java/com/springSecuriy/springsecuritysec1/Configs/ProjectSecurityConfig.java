@@ -1,16 +1,14 @@
 package com.springSecuriy.springsecuritysec1.Configs;
 
-import javax.sql.DataSource;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 
 
 @Configuration
@@ -19,21 +17,21 @@ public class ProjectSecurityConfig {
     @Bean
     SecurityFilterChain defultsSecurityFilterChain(HttpSecurity http) throws Exception{
 
-        http.authorizeHttpRequests((requests) -> requests
+        http.csrf(csrfConfig -> csrfConfig.disable()).authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards").authenticated()
-                .requestMatchers("/notices", "/contact", "/error").permitAll());
+                .requestMatchers("/notices", "/contact", "/error", "/register").permitAll());
         http.formLogin(withDefaults());
         http.httpBasic(withDefaults());
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService(DataSource dataSource)
-    {
+    // @Bean
+    // public UserDetailsService userDetailsService(DataSource dataSource)
+    // {
         
 
-        return new JdbcUserDetailsManager(dataSource);
-    }
+    //     return new JdbcUserDetailsManager(dataSource);
+    // }
 
     @Bean
     public PasswordEncoder passwordEncoder()
@@ -41,9 +39,9 @@ public class ProjectSecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    // @Bean
-    // public CompromisedPasswordChecker compromisedPasswordChecker()
-    // {
-    //     return new HaveIBeenPwnedRestApiPasswordChecker();
-    // }
+    @Bean
+    public CompromisedPasswordChecker compromisedPasswordChecker()
+    {
+        return new HaveIBeenPwnedRestApiPasswordChecker();
+    }
 }
